@@ -1,0 +1,718 @@
+## 0.HTTPS简介
+### 0.1 SSL和TLS
+- 传输层安全协议（Transport Layer Security, 缩写TLS），及其前身安全层（Secure Sockets Layer,缩写SSL）是一种安全协议，目的是为互联网通信，提供安全及数据完整性保障
+
+![](/public/images/https_http.png)
+
+### 0.2 HTTPS
+- HTTPS 协议的主要功能基本都依赖于TLS/SSL协议，TLS/SSL的功能实现主要依赖于三类基本算法
+    - 散列函数 散列函数验证信息的完整性
+    - 对称加密 对称加密算法采用协商的密钥对数据加密
+    - 非对称加密 非对称加密实现身份认证和密钥协商
+
+![](/public/images/tls_ssl.png)
+
+## 1.加密
+- 加密就是研究如何安全通信的
+- 保证数据在传输过程中不会被窃听
+- [crypto](https://nodejs.org/dist/latest-v13.x/docs/api/crypto.html)
+
+### 1.1 对称加密
+- 对称加密是最快速、最简单的一种加密方式，加密（encryption）与解密（decryption）用的是同样的密钥（secret key）
+- 主流的有 AES 和 DES
+#### 1.1.1 描述
+#### 1.1.2 简单实现
+- 消息 abc
+- 密钥 3
+- 密文 def
+- ![](/public/images/kaisamima.png)
+
+```js
+let secretKey = 3;
+function encrypt(str) {
+    let buffer = Buffer.from(str);
+    for(let i = 0; i < buffer.length; i++) {
+        buffer[i] = buffer[i] + secretKey;
+    }
+    return buffer.toString();
+}
+function decrypt(str) {
+    let buffer = Buffer.from(str);
+    for(let i = 0; i < buffer.length; i++) {
+        buffer[i] = buffer[i] - secretKey;
+    }
+    return buffer.toString();
+}
+let message = 'abc';
+let secret = encrypt(message);
+console.log(secret);
+let value = decrypt(secret);
+console.log(value);
+```
+#### 1.1.3 AES
+- [crypto.html](https://nodejs.org/api/crypto.html#crypto_crypto_createcipheriv_algorithm_key_iv_options)
+    - algorithm 用于指定加密算法，如aes-128-ecb、aes-128-cbc等
+    - key 是用于加密的密钥
+    - iv 参数用于指定加密时所用的向量
+- 如果加密算法是128，则对应的密钥是16位，加密算法是256，则对应的密钥是32位
+
+![](/public/images/Symmetric_encryption.png)
+
+```js
+const crypto = require('crypto');
+function encrypt(data, key, iv) {
+    let decipher = crypto.createCipheriv('aes-128-cbc', key, iv);
+    decipher.update(data);
+    return decipher.final('hex');
+}
+
+function decrypt(data, key, iv) {
+    let decipher = crypto.createDecipheriv('aes-128-cbc', key, iv);;
+    decipher.update(data, 'hex');
+    return decipher.final('utf8');
+}
+
+let key = '1234567890123456';
+let iv = '1234567890123456';
+let data = "hello";
+let encrypted = encrypt(data, key, iv);
+console.log("数据加密后：", encrypted);
+let decrypted = decrypt(encrypted, key, iv);
+console.log("数据解密后：", decrypted);
+```
+### 1.2 非对称加密
+- 互联网上没有办法安全的交换密钥
+#### 1.2.1 单向函数
+- 单向函数顺向计算起来非常的容易，但求逆却非常的困难。也就是说，已知x,我们很容易计算出f(x)。但已知f(x)，却很难计算出x
+- 整数分解又称因素分解，是将一个正整数成几个约数的乘积
+- 给出 45 这个数，它可以分解成 9x5,这样的分解结果应该是独一无二的
+#### 1.2.2 RSA加密算法
+![](/public/images/RSA.png)
+
+```js
+let p = 3, q = 11; // 计算完立刻销毁
+let N = p * q;
+let fN = (p - 1) * (q - 1); // 欧拉函数
+let e = 7;
+for(var d = 1; e * d % fN !== 1; d++) { // 扩展欧几里得算法
+    d++;
+}
+// d=3
+let publicKey = { e, N };
+let privateKey = { d, N };
+
+function encrypt(data) {
+    return Math.pow(data, publicKey.e) % publicKey.N;
+}
+function decrypt(data) {
+    return Math.pow(data, privateKey.d) % privateKey.N;
+}
+let data = 5;
+let secret = encrypt(data);
+console.log(secret); // 14
+
+let _data = decrypt(secret);
+console.log(_data); // 5
+// 1024位二进制数分解
+/**
+公开 N e c
+私密 d
+e * d % fN == 1
+(p - 1) * (q - 1)
+N = p * q
+*/
+```
+#### 1.2.3 RSA 加密
+```js
+let { generateKeyPairSync, privateEncrypt, publicDecrypt } = require('crypto');
+let rsa = generateKeyPairSync('rsa', {
+    modulesLength: 1024,
+    publicKeyEncodeing: {
+        type: 'spki',
+        format: 'pem'
+    },
+    privateKeyEncoding: {
+        type: 'pkcs8',
+        format: 'pem',
+        cipher: 'aes-256-cbc',
+        passphrase: 'server_passphrase'
+    }
+});
+let message = 'hello';
+let enc_by_prv = privateEncrypt({
+    key: rsa.privateKey,
+    passphrase: 'server_passphrase'
+}, Buffer.from(message, 'utf8'));
+console.log('encrypted by private key: ' + enc_by_prv.toString('hex'));
+
+let dec_by_pub = publicDecrypt(rsa.publicKey, enc_by_prv);
+console.log('decrypted by public key: ' + dec_by_pub.toString('utf8'));
+
+```
+### 1.3 哈希
+- hash 切碎的食物
+![](/public/images/hashfood.jpg)
+#### 1.3.1 哈希函数
+- 哈希函数的作用是给一个任意长度的数据生成一个固定长度的数据
+- 安全性 可以从给定的数据X计算出哈希值Y,但不能从哈希值Y计算出数据X
+- 独一无二 不同的数据一定会产出一个不同的哈希值
+- 长度固定 不管输入多大的数据，输出长度都是固定的
+#### 1.3.2 哈希碰撞
+- 所谓哈希(hash)，就是将不同的输入映射成独一无二、固定长度的值（又称”哈希值“）。它是最常见的软件运算之一
+- 如果不同的输入得到了同一个哈希值，就发生了哈希碰撞（collision）
+- 防止哈希碰撞的最有效方法，就是扩大哈希值的取值空间
+- 16个二进制位的哈希值，产生碰撞的可能性是65536分之一。也就是说，如果有65537个用户，就一定会产生碰撞。哈希值的长度扩大到32个二进制位，碰撞的可能性就会下降到 4,294,967,296 分之一
+
+```js
+console.log(Math.pow(2, 16)); // 65536
+console.log(Math.pow(2, 32)); // 42亿
+```
+#### 1.3.3 哈希分类
+- 哈希还可以叫摘要（digest）、校验值（chunkSum）和指纹（fingerPrint）
+- 如果两段数据完全一样，就可以证明数据是一样的
+- 哈希有二种
+    - 普通哈希用来做完整性校验，流行的是MD5
+    - 加密哈希用来做加密，目前最流行的家命名算法是 SHA256（Secure Hash Algorithm）系列
+#### 1.3.4 hash使用
+##### 1.3.4.1 简单哈希
+```js
+function hash(input) {
+    return input % 1024;
+}
+let r1 = hash(100);
+let r2 = hash(1124);
+console.log(r1, rs);
+```
+##### 1.3.4.2 md5
+```js
+var crypto = require('crypto');
+var content = '123456';
+var result = crypto.createHash('md5').update(content).digest("hex");
+console.log(result); // 32位十六进制 = 128位二进制
+```
+##### 1.3.4.3 sha256
+```js
+const salt = '123456';
+const sha256 = str => crypto.createHmac('sha256', salt)
+    .update(str, 'utf8')
+    .digest('hex')
+
+let ret = sha256(content);
+console.log(ret); // 64位十六进制 = 256位二进制
+```
+### 1.4 数字签名
+- 数字签名的基本原理是用私钥去签名，而用公钥去验证签名
+
+![](/public/images/number_sign2.png);
+
+![](/public/images/verify3.png);
+
+```js
+let { generateKeyPairSync, createSign, createVerify } = require('crypto');
+let passphrase = 'zhufeng';
+let rsa = generateKeyPairSync('rsa', {
+    modulesLength: 1024,
+    publicKeyEncoding: {
+        type: 'spki',
+        format: 'pem'
+    },
+    privateKeyEncoding: {
+        type: 'pkcs8',
+        format: 'pem',
+        cipher: 'aes-256-cbc',
+        passphrase
+    }
+});
+let content = "hello";
+const sign = getSign(content, rsa.privateKey, passphrase);
+let serverCertIsValid = verifySign(content, sign, rsa.publicKey);
+console.log('serverCertIsValid', serverCertIsValid);
+function getSign(content, privateKey, passphrase) {
+    var sign = createSign("RSA-SHA256");
+    sign.update(content);
+    return sign.sign({key: privateKey, format: 'pem', passphrase}, 'hex');
+}
+function verifySign(content, sign, publicKey) {
+    var verify = createVerify("RSA-SHA256");
+    verify.update(content);
+    return verify.verify(publicKey, sign, "hex");
+}
+```
+### 1.5 数字证书
+- 数字证书是一个由可信的第三方发出的，用来证明所有人身份以及所有人拥有某个公钥的电子文件
+
+![](/public/images/certification3.png)
+
+```js
+let { generateKeyPairSync, createSign, createVerify, createHash } = require("crypto");
+let passphrase = "zhufeng";
+let rsa = generateKeyPairSync("rsa", {
+    modulusLength: 1024,
+    publicKeyEncoding: {
+        type: "spki",
+        format: "pem"
+    },
+    privateKeyEncoding: {
+        type: "pkcs8",
+        format: "pem",
+        cipher: "aes-256-cbc",
+        passphrase
+    }
+});
+const info = {
+    domain: "http://127.0.0.1:8080",
+    publicKey: rsa.publicKey
+};
+const hash = createHash("sha256").update(JSON.stringify(info)).digest("hex");
+const sign = getSign(hash, rsa.privateKey, passphrase);
+const cert = { info, sign };
+
+let certIsValid = verifySign(hash, cert.sign, rsa.publicKey);
+console.log('certIsValid', certIsValid);
+
+function getSign(content, privateKey, passphrase) {
+    var sign = createSign("RSA-SHA256");
+    sign.update(content);
+    return sign.sign({ key: privateKey, format: "pem", passphrase }, "hex");
+}
+function verifySign(content, sign, publicKey) {
+    var verify = createVerify("RSA-SHA256");
+    verify.update(content);
+    return verify.verify(publicKey, sign, 'hex');
+}
+```
+### 1.6 Diffie-Hellman算法
+- Diffie-Hellman算法是一种密钥交换协议，它可以让双方在不泄露密钥的情况下协商出一个密钥来
+
+![](/public/images/premastersecret.jpg)
+
+#### 1.6.1 Diffie-Hellman实现
+```js
+let N = 23;
+let p = 5;
+let secret1 = 6; // 这是密钥
+let A = Math.pow(p, secret1) % N; // 8
+console.log('p=', p, 'N=', N, 'A=', A);
+
+let secret2 = 15;
+let B = Math.pow(p, secret2) % N; // 19
+console.log('p=', p, 'N=', N, 'B=', B);
+
+console.log(Math.pow(B, secret1) % N);
+console.log(Math.pow(A, secret2) % N);
+```
+#### 1.6.2 Diffie-Hellman算法
+```js
+const { createDiffieHellman } = require("crypto");
+
+var client = createDiffieHellman(512);
+var client_keys = client.generateKeys();
+
+var prime = client.getPrime();
+var generator = client.getGenerator();
+
+var server = createDiffieHellman(prime, generator);
+var server_keys = server.generateKeys();
+
+var client_secret = client.computeSecret(server_keys);
+var server_secret = server.computeSecret(client_keys);
+
+console.log('client_secret: ' + client_secret.toString("hex"));
+console.log('server_secret: ' + server_secret.toString("hex"));
+```
+
+### 1.7 ECC
+- 椭圆曲线加密算法(ECC)是基于椭圆曲线数学的一种公钥加密的算法
+
+![](/public/images/ecc.png)
+
+#### 1.7.1 ECC 原理
+```js
+let G = 3;
+let a = 5;
+let A = G * a;
+let b = 7;
+let B = G * b;
+console.log(a * B);
+console.log(b * A);
+```
+
+#### 1.7.2 ECC 使用
+```js
+let { createECDH } = require("crypto");
+const clientDH = createECDH("secp521r1");
+const clientDHParams = clientDH.generateKeys();
+
+const serverDH = createECDH("secp521r1");
+const serverDHParams = serverDH.generateKeys();
+
+const clientKey = clientDH.computeSecret(serverDHParams);
+const serverKey = serverDH.computeSecret(clientDHParams);
+console.log('clientKey', clientKey.toString("hex"));
+console.log('serverKey', serverKey.toString("hex"));
+```
+
+## 2. UDP服务器
+![](/public/images/wiresharkhttp.png)
+
+![](/public/images/httpsoverflow.png)
+
+![](/public/images/premasterkeymasterkey.png)
+
+wireshark
+```
+tls and (ip.src == 47.111.100.159 or ip.dst == 47.111.100.159)
+```
+### 2.1 createCA.js
+```js
+const ca_passphrase = 'ca';
+let CA = generateKeyPairSync('rsa', {
+    modulusLength: 1024,
+    publicKeyEncoding: {
+        type: 'spki',
+        format: 'pem'
+    },
+    privateKeyEncoding: {
+        type: 'pkcs8',
+        format: 'pem',
+        cipher: 'aes-256-cbc',
+        passphrase: ca_passphrase
+    }
+});
+let fs = require('fs');
+let path = require('path');
+fs.writeFileSync(path.resolve(__dirname, 'CA.publicKey'), CA.publicKey);
+fs.writeFileSync(path.resolve(__dirname, 'CA.privateKey'), CA.privateKey);
+```
+### 2.2 ca.js
+```js
+const { createHash } = require('crypto');
+const { getSign } = require('./utils');
+const ca_passphrase = 'ca';
+const fs = require('fs');
+const path = require('path');
+
+let cAPrivateKey = fs.readFileSync(path.resolve(__dirname, 'CA.privateKey'), 'utf8');
+function requestCert(info) {
+    const infoHash = createHash('sha256').update(JSON.stringify(info)).digest("hex");
+    const sign = getSign(infoHash, cAPrivateKey, ca_passphrase);
+    return { info, sign };
+}
+exports.requestCert = requestCert;
+```
+
+### 2.3 utils.js
+```js
+const { createCipheriv, createDecipheriv, createSign, createVerify } = require('crypto');
+function encrypt(data, key) {
+    let decipher = createCipheriv('aes-256-cbc', key, '1234567890123456');
+    decipher.update(data);
+    return decipher.final("hex");
+}
+
+function decrypt(data, key) {
+    let decipher = createDecipheriv('aes-256-cbc', key, '1234567890123456');
+    decipher.update(data, 'hex');
+    return decipher.final("utf8");
+}
+
+function getSign(content, privateKey, passphrase) {
+    var sign = createSign("RSA-SHA256");
+    sign.update(content);
+    return sign.sign({
+        key: privateKey,
+        format: 'pem',
+        passphrase
+    }, "hex");
+}
+
+function verifySign(content, sign, publicKey) {
+    var verify = createVerify("RSA-SHA256");
+    verify.update(content);
+    return verify.verify(publicKey, sign, "hex");
+}
+
+module.exports = {
+    encrypt,
+    decrypt,
+    getSign,
+    verifySign
+}
+```
+
+### 2.4 udp_server.js
+```js
+const dgram = require("dgram");
+const udp_server = dgram.createSocket("udp4");
+const protocol = require("./protocol");
+const { generateKeyPairSync, randomBytes, createHash, createECDH } = require("crypto");
+const server_passphrase = "server";
+const { getSign, decrypt, encrypt } = require("./utils");
+
+let serverRSA = generateKeyPairSync("rsa", {
+    modulusLength: 1024,
+    publicKeyEncoding: {
+        type: "spki",
+        format: "pem"
+    },
+    privateKeyEncoding: {
+        type: "pkcs8",
+        format: "pem",
+        cipher: "aes-256-cbc",
+        passphrase: server_passphrase
+    }
+});
+let serverRandom = randomBytes(8).toString("hex");
+const serverInfo = {
+    domain: "http://127.0.0.1:20000",
+    publicKey: serverRSA.publicKey
+};
+let serverCert = requestCert(serverInfo);
+let clientRandom;
+const serverDH = createECDH("secp521r1");
+const ecDHServerParams = serverDH.generateKeys().toString("hex");
+const ecDHServerParamsSign = getSign(ecDHServerParams, serverRSA.privateKey, server_passphrase);
+let masterKey;
+let sessionKey;
+udp_server.on("listening", () => {
+    const address = udp_server.address();
+    console.log(`client running ${address.address}: ${address.port}`)
+})
+udp_server.on("message", (data, remote) => {
+    let message = JSON.parse(data);
+    switch(message.type) {
+        case protocol.ClientHello:
+            // 2.在服务器生成随机数，通过ServerHello发送给客户端
+            clientRandom = message.clientRandom;
+            udp_server.send(JSON.stringify({
+                type: protocol.ServerHello,
+                serverRandom, // 服务器端随机数
+                cipherSuite: "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA" //约定的加密套件
+            }), remote.port, remote.address);
+            // 3. Certificate 服务器把包含自己公钥的证书发送给客户端进行验证
+            udp_server.send(JSON.stringify({
+                type: protocol.Certificate,
+                serverCert, // 服务器公钥证书
+            }), remote.port, remote.address);
+            //4.ServerKeyExchange 服务器端生成DH参数，并用服务器私钥进行签名发给客户端
+            udp_server.send(JSON.stringify({
+                type: protocol.ServerKeyExchange,
+                ecDHServerParams,
+                ecDHServerParamsSign
+            }), remote.port, remote.address);
+            //5.Server Hello Done 服务器发送完成
+            udp_server.send(JSON.stringify({
+                type: protocol.ServerHelloDone
+            }), remote.port, remote.address);
+            break;
+        case protocol.ClientKeyExchange:
+            //6.ClientKeyExchange 服务器收到客户端DH参数后加上服务器DH参数生成pre-master-key
+            //再由pre-master-key生成masterKey和sessionKey
+            let { ecDHClientParams } = message;
+            preMasterKey = serverDH.computeSecret(Buffer.from(ecDHClientParams, 'hex')).toString('hex');
+            masterKey = createHash('md5').update(preMasterKey + clientRandom + serverRandom).digest('hex');
+            sessionKey = createHash('md5').update(masterKey + clientRandom + serverRandom).digest('hex');
+            break;
+        case protocol.ChangeCipherSpec:
+            //9.服务器通知客户端服务器也已经准备好切换加密套件了
+            udp_server.send(JSON.stringify({
+                type: protocol.ChangeCipherSpec
+            }), remote.port, remote.address);
+            break;
+        case protocol.EncryptedHandshakeMessage:
+            console.log("服务器收到解密后的数据:", decrypt(message.data, sessionKey));
+            //10.服务器收到客户端的加密数据后向客户端回复加密数据
+            udp_server.send(JSON.stringify({
+                type: protocol.EncryptedHandshakeMessage,
+                data: encrypt("i am server", sessionKey)
+            }), remote.port, remote.address);
+            break;
+        default:
+            break;
+    }
+})
+udp_server.on('error', (error) => {
+    console.log(error);
+});
+udp_server.bind(20000, '127.0.0.1');
+```
+### 2.5 udp_client.js
+```js
+const dgram = require('dgram')
+const udp_client = dgram.createSocket('udp4')
+const { randomBytes, createHash, createECDH } = require('crypto');
+const { verifySign, encrypt, decrypt } = require('./utils');
+const url = require('url');
+const protocol = require('./protocol');
+const fs = require('fs');
+const path = require('path');
+const cAPublicKey = fs.readFileSync(path.resolve(__dirname, 'CA.publicKey'), 'utf8');
+const clientRandom = randomBytes(8).toString('hex');
+let serverRandom;
+let serverPublicKey;
+let ecDHServerParams;
+let clientDH = createECDH('secp521r1');
+let ecDHClientParams = clientDH.generateKeys();
+let masterKey;
+let sessionKey;
+udp_client.on('listening', () => {
+    const address = udp_client.address();
+    console.log(`client running ${address.address}: ${address.port}`)
+})
+udp_client.on('message', (data, remote) => {
+    let message = JSON.parse(data.toString('utf8'));
+    switch (message.type) {
+        case protocol.ServerHello:
+            serverRandom = message.serverRandom;
+            break;
+        case protocol.Certificate:
+            //3.Certificate 客户收到服务器证书后会用CA的公钥进行验证证书是否合法
+            let { serverCert } = message;
+            let { info, sign } = serverCert;
+            serverPublicKey = info.publicKey;
+            const serverInfoHash = createHash('sha256').update(JSON.stringify(info)).digest('hex');
+            let serverCertIsValid = verifySign(serverInfoHash, sign, cAPublicKey);
+            console.log('验证服务器端证书是否正确?', serverCertIsValid);
+            let urlObj = url.parse(info.domain);
+            let serverDomainIsValid = urlObj.hostname === remote.address && urlObj.port == remote.port;
+            console.log('验证服务器端域名正确?', serverDomainIsValid);
+            break;
+        case protocol.ServerKeyExchange:
+            //4.ServerKeyExchange 客户端收到服务器的DH参数和参数签名后会用服务器的公钥进行签名，验证服务器拥有私钥
+            ecDHServerParams = message.ecDHServerParams;
+            ecDHServerParamsSign = message.ecDHServerParamsSign;
+            let serverDHParamIsValid = verifySign(ecDHServerParams, ecDHServerParamsSign, serverPublicKey);
+            console.log('验证服务器端证书DH参数是否正确?', serverDHParamIsValid);
+            break;
+        case protocol.ServerHelloDone:
+            //6.ClientKeyExchange 客户端生成DH参数并且发给服务器
+            udp_client.send(JSON.stringify({
+                type: protocol.ClientKeyExchange,
+                ecDHClientParams
+            }), remote.port, remote.address);
+            //6.ClientKeyExchange 服务器收到客户端DH参数后加上服务器DH参数生成pre-master-key
+            //再由pre-master-key生成masterKey和sessionKey
+            preMasterKey = clientDH.computeSecret(Buffer.from(ecDHServerParams, 'hex')).toString('hex');
+            masterKey = createHash('md5').update(preMasterKey + clientRandom + serverRandom).digest('hex');
+            sessionKey = createHash('md5').update(masterKey + clientRandom + serverRandom).digest('hex');
+            //7.Change Cipher Spec 通知服务器客户端已经准备好切换成加密通信了
+            udp_client.send(JSON.stringify({
+                type: protocol.ChangeCipherSpec
+            }), remote.port, remote.address);
+            //8.加密握手信息并传送给服务器端
+            udp_client.send(JSON.stringify({
+                type: protocol.EncryptedHandshakeMessage,
+                data: encrypt("i am client", sessionKey)
+            }), remote.port, remote.address);
+            break;
+        case protocol.EncryptedHandshakeMessage:
+            //10.客户端你好到服务器的加密握手数据
+            //这个报文的目的就是告诉对端自己在整个握手过程中收到了什么数据，发送了什么数据。来保证中间没人篡改报文
+            console.log("客户端收到解密后的数据:", decrypt(message.data, sessionKey));
+            break;
+        default:
+            break;
+    }
+})
+udp_client.on('error', (error) => {
+    console.log(error);
+});
+//1.ClientHello 客户端向服务器发送客户端随机数，服务器需要保存在服务器端
+udp_client.send(JSON.stringify({
+    type: protocol.ClientHello,
+    clientRandom
+}), 20000, '127.0.0.1');
+```
+## 3.数字证书实战
+- [OpenSSL](https://www.openssl.org/source/)
+- [WinOpenSSL](http://slproweb.com/products/Win32OpenSSL.html)
+- 安装后要添加环境变量 C:\Program Files\OpenSSL-Win64\bin
+
+### 3.1 自建CA
+```
+// 1.生成CA钥匙
+openssl genrsa -des3 -out ca.private.pem 1024
+// 2.生成CA证书请求
+openssl req -new -key ca.private.pem -out ca.csr
+// 3.生成CA根证书
+openssl x509 -req -in ca.csr -extensions v3_ca -signkey ca.private.pem -out ca.crt
+```
+### 3.2 生成服务器CA证书
+```
+// 1.生成server私匙
+openssl genrsa -out server.private.pem 1024
+// 2.生成server证书请求
+openssl req -new -key server.private.pem -out server.csr
+// 3.生成server证书
+openssl x509 -days 365 -req -in server.csr -extensions  v3_req -CAkey  ca.private.pem -CA ca.crt -CAcreateserial -out server.crt  -extfile openssl.cnf
+```
+
+openssl.cnf
+```
+[req]  
+    distinguished_name = req_distinguished_name  
+    req_extensions = v3_req  
+    [req_distinguished_name]  
+    countryName = CN 
+    countryName_default = CN  
+    stateOrProvinceName = Beijing  
+    stateOrProvinceName_default = Beijing  
+    localityName = Beijing 
+    localityName_default = Beijing
+    organizationalUnitName  = HD
+    organizationalUnitName_default  = HD
+    commonName = localhost  
+    commonName_max  = 64  
+
+    [ v3_req ]  
+    # Extensions to add to a certificate request  
+    basicConstraints = CA:FALSE  
+    keyUsage = nonRepudiation, digitalSignature, keyEncipherment  
+    subjectAltName = @alt_names  
+
+    [alt_names]  
+    #注意这个IP.1的设置，IP地址需要和你的服务器的监听地址一样 DNS为server网址，可设置多个ip和dns
+    IP.1 = 127.0.0.1
+    DNS.1 = localhost
+```
+### 3.3 服务端
+```js
+const https = require('https');
+const fs = require('fs');
+const path = require('path');
+
+const options = {
+    key: fs.readFileSync(path.resolve(__dirname, 'ssl/server.private.pem')),
+    cert: fs.readFileSync(path.resolve(__dirname, 'ssl/server.crt'))
+};
+
+
+https.createServer(options, (req, res) => {
+    res.end('hello world\n');
+}).listen(9000);
+
+console.log("server https is running 9000");
+```
+### 3.4 客户端
+```js
+const https = require('https');
+const options = {
+    hostname: '127.0.0.1',
+    port: 9000,
+    path: '/',
+    method: 'GET',
+    requestCert: true,  //请求客户端证书
+    rejectUnauthorized: false //不拒绝不受信任的证书
+};
+
+const req = https.request(options, (res) => {
+    let buffers = [];
+    res.on('data', (chunk) => {
+        buffers.push(chunk);
+    });
+    res.on('end', () => {
+        console.log(buffers.toString());
+    });
+});
+req.end();
+```
