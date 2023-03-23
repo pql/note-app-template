@@ -1,118 +1,145 @@
 ## 1.VSCODE
-### 1.1 实用node启动调试
+
+### 1.1 实用 node 启动调试
+
 ```json
 {
-    "type": "node",
-    "request": "launch",
-    "name": "启动程序",
-    "program": "E:/cli.js"
+  "type": "node",
+  "request": "launch",
+  "name": "启动程序",
+  "program": "E:/cli.js"
 }
 ```
+
 - [VSCODE](https://cnodejs.org/topic/58f376fec749f63d48fe9548)
 
 ### 1.2 保存时自动格式化
 
 File->Preferences->User Settings
+
 ```json
 {
-    "editor.formatOnType": false,
-    "editor.formatOnSave": false
+  "editor.formatOnType": false,
+  "editor.formatOnSave": false
 }
 ```
 
 ### 1.3 语言改为英文
-快捷键Command+Shift+P（Win下为Control）打开命令行工具,输入设置语言，会打开一个locale.json的文件，如下面所示
 
-- 定义 VSCode 的显示语言。 请参阅 [http://go.microsoft.com/fwlink/?LinkId=761051，了解支持的语言列表。](http://go.microsoft.com/fwlink/?LinkId=761051%EF%BC%8C%E4%BA%86%E8%A7%A3%E6%94%AF%E6%8C%81%E7%9A%84%E8%AF%AD%E8%A8%80%E5%88%97%E8%A1%A8%E3%80%82) 
-- 要更改值需要重启 VSCode。 "locale":"zh-CN" } 将locale的值改为en-US之后重启VSCode就恢复到英文版本的了!
+快捷键 Command+Shift+P（Win 下为 Control）打开命令行工具,输入设置语言，会打开一个 locale.json 的文件，如下面所示
+
+- 定义 VSCode 的显示语言。 请参阅 [http://go.microsoft.com/fwlink/?LinkId=761051，了解支持的语言列表。](http://go.microsoft.com/fwlink/?LinkId=761051%EF%BC%8C%E4%BA%86%E8%A7%A3%E6%94%AF%E6%8C%81%E7%9A%84%E8%AF%AD%E8%A8%80%E5%88%97%E8%A1%A8%E3%80%82)
+- 要更改值需要重启 VSCode。 "locale":"zh-CN" } 将 locale 的值改为 en-US 之后重启 VSCode 就恢复到英文版本的了!
 
 ### 1.4 快捷键
+
 - 列选择 alt+shift+左键
-- 多点编辑 按alt点击左键
+- 多点编辑 按 alt 点击左键
 - 格式化 Alt+shift+f
 
 ### 1.5 单行注释
+
 单行注释
+
 ```
 //.+?(?=["$\r\n]
 ```
 
 ### 1.6 多行注释
+
 ```
 \/\*([\w\W]+?)\*\/
 ```
 
 ### 1.7 空行
+
 ```
 ^\s*(?=\r?$)\n
 ```
 
 ### 1.8 全部替换
+
 ```
 ((\/\*([\w\W]+?)\*\/)|(\/\/.+?(?=["$\r\n]))|(^\s*(?=\r?$)\n))
 ```
+
 ![](/public/images/emptylineregexp.png)
 
-| 表达式 | 含义 |
-| --- | --- |
-| (?:) | 表示非捕获分组，和捕获分组唯一的区别在于，非捕获分组匹配的值不会保存起来 |
-| (?=pattern) | 正向肯定查找(前瞻),后面必须跟着什么 |
+| 表达式      | 含义                                                                     |
+| ----------- | ------------------------------------------------------------------------ |
+| (?:)        | 表示非捕获分组，和捕获分组唯一的区别在于，非捕获分组匹配的值不会保存起来 |
+| (?=pattern) | 正向肯定查找(前瞻),后面必须跟着什么                                      |
 
 ### 1.9 rm-js-comment
+
 ```json
 {
- "__WEBPACK": "",
- "__webpack_handle_async_dependencies__": "async_dependencies",
- "IMPORTED_MODULE_": "",
- "__WEBPACK_DEFAULT_EXPORT__": "DEFAULT_EXPORT",
- "__webpack_exports__": "exports",
- "__unused_webpack_module": "module",
- "__WEBPACK_EXTERNAL_MODULE_": "EXTERNAL_MODULE_",
- "__WEBPACK_DYNAMIC_EXPORT__": "DYNAMIC_EXPORT",
- "__system_context__": "system_context",
- "__webpack_require__": "require",
- "__webpack_module_cache__": "cache",
- "__webpack_modules__": "modules",
- "__WEBPACK_IMPORTED_MODULE_": "_IMPORTED_MODULE_",
- "/*#__PURE__*/": "",
- "___EXPOSE_LOADER_IMPORT___": "EXPOSE_IMPORT",
- "___EXPOSE_LOADER_GET_GLOBAL_THIS___": "GET_GLOBAL_THIS",
- "___EXPOSE_LOADER_GLOBAL_THIS___": "GLOBAL_THIS"
+  "__WEBPACK": "",
+  "__webpack_handle_async_dependencies__": "async_dependencies",
+  "IMPORTED_MODULE_": "",
+  "__WEBPACK_DEFAULT_EXPORT__": "DEFAULT_EXPORT",
+  "__webpack_exports__": "exports",
+  "__unused_webpack_module": "module",
+  "__WEBPACK_EXTERNAL_MODULE_": "EXTERNAL_MODULE_",
+  "__WEBPACK_DYNAMIC_EXPORT__": "DYNAMIC_EXPORT",
+  "__system_context__": "system_context",
+  "__webpack_require__": "require",
+  "__webpack_module_cache__": "cache",
+  "__webpack_modules__": "modules",
+  "__WEBPACK_IMPORTED_MODULE_": "_IMPORTED_MODULE_",
+  "/*#__PURE__*/": "",
+  "___EXPOSE_LOADER_IMPORT___": "EXPOSE_IMPORT",
+  "___EXPOSE_LOADER_GET_GLOBAL_THIS___": "GET_GLOBAL_THIS",
+  "___EXPOSE_LOADER_GLOBAL_THIS___": "GLOBAL_THIS"
 }
 ```
 
 ## 2.MAC
+
 ### 2.1 杀死进程
+
 查看进程占用
+
 ```sh
 lsof -i tcp:8080
 ```
-该命令会显示占用8080端口的进程，有其pid，可以通过pid关掉该进程
+
+该命令会显示占用 8080 端口的进程，有其 pid，可以通过 pid 关掉该进程
+
 ```sh
 kill pid
 ```
+
 ### 2.2 查看端口占用
+
 #### 2.2.1 lsof
+
 ```sh
 lsof -i:port
 ```
+
 ```sh
 lsof -i:8080
 ```
+
 #### 2.2.2 netstat
+
 ```sh
 netstat -antp | grep port
 ```
+
 ```sh
 netstat -antp | grep 8080
 ```
-## 3.安装需要编译包
-### 3.1 安装sharp
-- [sharp](https://www.iqi360.com/p/sharp-cn)是一个高性能的nodejs图像处理库
-- [安装sharp](https://www.iqi360.com/p/sharp-cn/docs/5f8b012a5a726a40e3f0f02e)
-- [安装过程中遇到sharp安装慢](https://www.cnblogs.com/zzsdream/p/13391731.html)
-- [sharp-libvips](https://github.com/lovell/sharp-libvips/releases/tag/v8.10.5)
 
+## 3.安装需要编译包
+
+### 3.1 安装 sharp
+
+- [sharp](https://www.iqi360.com/p/sharp-cn)是一个高性能的 nodejs 图像处理库
+- [安装 sharp](https://www.iqi360.com/p/sharp-cn/docs/5f8b012a5a726a40e3f0f02e)
+- [安装过程中遇到 sharp 安装慢](https://www.cnblogs.com/zzsdream/p/13391731.html)
+- [sharp-libvips](https://github.com/lovell/sharp-libvips/releases/tag/v8.10.5)
 
 ```sh
 npm config set sharp_binary_host "https://npm.taobao.org/mirrors/sharp"
@@ -121,105 +148,114 @@ npm install sharp
 ```
 
 ### 3.2 编译
+
 - [node-gyp#on-windows](https://github.com/nodejs/node-gyp#on-windows)
 - [windows-build-tools](https://github.com/felixrieseberg/windows-build-tools)
 - [python](https://www.python.org/)
 
-### 3.2 cache目录
-- NPM会把所有下载的包保存，放在用户文件夹下面，在我的windows10机器上是保存在C:\Users\Administrator\AppData\Roaming\npm-cache下面
-- NPM install之后会计算每个包的sha1值，然后将包与他的sha1值关联保存在package.lock.json里面
-- 下次NPM install的时候会根据package.lock.json里面保存的sha1值去文件夹C:\Users\Administrator\AppData\Roaming\npm-cache里面寻找包文件，如果存在，就不用再次从网上下载安装包
-- NPM cache verify 重新计算C:\Users\Administrator\AppData\Roaming\npm-cache下的文件是否与sha1值匹配，如果不匹配可能删除？
-- NPM cache clean --force 这个命令从C:\Users\Administrator\AppData\Roaming\npm-cache下删除所有缓存文件
-- NPM不同版本算出来的sha1貌似不完全一样，所以直接用别人的package.lock.json会报sha1不匹配的error
+### 3.2 cache 目录
+
+- NPM 会把所有下载的包保存，放在用户文件夹下面，在我的 windows10 机器上是保存在 C:\Users\Administrator\AppData\Roaming\npm-cache 下面
+- NPM install 之后会计算每个包的 sha1 值，然后将包与他的 sha1 值关联保存在 package.lock.json 里面
+- 下次 NPM install 的时候会根据 package.lock.json 里面保存的 sha1 值去文件夹 C:\Users\Administrator\AppData\Roaming\npm-cache 里面寻找包文件，如果存在，就不用再次从网上下载安装包
+- NPM cache verify 重新计算 C:\Users\Administrator\AppData\Roaming\npm-cache 下的文件是否与 sha1 值匹配，如果不匹配可能删除？
+- NPM cache clean --force 这个命令从 C:\Users\Administrator\AppData\Roaming\npm-cache 下删除所有缓存文件
+- NPM 不同版本算出来的 sha1 貌似不完全一样，所以直接用别人的 package.lock.json 会报 sha1 不匹配的 error
 - `yarn cache list` 查看缓存的包
-- `yarn cache dir` 查询cache缓存文件目录路径
+- `yarn cache dir` 查询 cache 缓存文件目录路径
 - `yarn cache clean` yarn 清除缓存
-- `npm cache clean --force` npm清除缓存
+- `npm cache clean --force` npm 清除缓存
 
 ## 4.Yarn
-| 命令 | 说明 |
-| --- | --- |
-| yarn -v | 查看yarn版本 |
-| yarn config list | 查看yarn的所有配置 |
-| yarn config set registry [https://registry.npm.taobao.org/](https://registry.npm.taobao.org/) | 修改yarn的源镜像为淘宝源 |
-| yarn config set global-folder "D:\RTE\Yarn\global" | 修改全局安装目录, 先创建好目录(global), 我放在了Yarn安装目录下(D:\RTE\Yarn\global) |
-| yarn config set prefix "D:\RTE\Yarn\global\" | 修改全局安装目录的bin目录位置 |
-| yarn config set cache-folder "D:\RTE\Yarn\cache" | 修改全局缓存目录, 先创建好目录(cache), 和global放在同一层目录下 |
-| yarn config list | 查看所有配置 |
-| yarn global bin | 查看当前yarn的bin的位置 |
-| yarn global dir | 查看当前yarn的全局安装位置 |
+
+| 命令                                                                                          | 说明                                                                                 |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| yarn -v                                                                                       | 查看 yarn 版本                                                                       |
+| yarn config list                                                                              | 查看 yarn 的所有配置                                                                 |
+| yarn config set registry [https://registry.npm.taobao.org/](https://registry.npm.taobao.org/) | 修改 yarn 的源镜像为淘宝源                                                           |
+| yarn config set global-folder "D:\RTE\Yarn\global"                                            | 修改全局安装目录, 先创建好目录(global), 我放在了 Yarn 安装目录下(D:\RTE\Yarn\global) |
+| yarn config set prefix "D:\RTE\Yarn\global\"                                                  | 修改全局安装目录的 bin 目录位置                                                      |
+| yarn config set cache-folder "D:\RTE\Yarn\cache"                                              | 修改全局缓存目录, 先创建好目录(cache), 和 global 放在同一层目录下                    |
+| yarn config list                                                                              | 查看所有配置                                                                         |
+| yarn global bin                                                                               | 查看当前 yarn 的 bin 的位置                                                          |
+| yarn global dir                                                                               | 查看当前 yarn 的全局安装位置                                                         |
 
 ## 5.lerna
-| 命令 | 功能 |
-| --- | --- |
-| lerna bootstrap | 安装依赖 |
-| lerna clean | 删除各个包下的node_modules |
-| lerna init | 创建新的lerna库 |
-| lerna list | 查看本地包列表 |
-| lerna changed | 显示自上次release tag以来有修改的包， 选项通 list |
-| lerna diff | 显示自上次release tag以来有修改的包的差异， 执行 git diff |
-| lerna exec | 在每个包目录下执行任意命令 |
-| lerna run | 执行每个包package.json中的脚本命令 |
-| lerna add | 添加一个包的版本为各个包的依赖 |
-| lerna import | 引入package |
-| lerna link | 链接互相引用的库 |
-| lerna create | 新建package |
-| lerna publish | 发布 |
+
+| 命令            | 功能                                                        |
+| --------------- | ----------------------------------------------------------- |
+| lerna bootstrap | 安装依赖                                                    |
+| lerna clean     | 删除各个包下的 node_modules                                 |
+| lerna init      | 创建新的 lerna 库                                           |
+| lerna list      | 查看本地包列表                                              |
+| lerna changed   | 显示自上次 release tag 以来有修改的包， 选项通 list         |
+| lerna diff      | 显示自上次 release tag 以来有修改的包的差异， 执行 git diff |
+| lerna exec      | 在每个包目录下执行任意命令                                  |
+| lerna run       | 执行每个包 package.json 中的脚本命令                        |
+| lerna add       | 添加一个包的版本为各个包的依赖                              |
+| lerna import    | 引入 package                                                |
+| lerna link      | 链接互相引用的库                                            |
+| lerna create    | 新建 package                                                |
+| lerna publish   | 发布                                                        |
 
 ## 6.yarn
-| 作用 | 命令 |
-| --- | --- |
-| 查看工作空间信息 | yarn workspaces info |
-| 给根空间添加依赖 | yarn add chalk cross-spawn fs-extra --ignore-workspace-root-check |
-| 给某个项目添加依赖 | yarn workspace create-react-app3 add commander |
-| 删除所有的 node_modules | lerna clean 等于 yarn workspaces run clean |
-| 安装和link | yarn install 等于 lerna bootstrap --npm-client yarn --use-workspaces |
-| 重新获取所有的 node_modules | yarn install --force |
-| 查看缓存目录 | yarn cache dir |
-| 清除本地缓存 | yarn cache clean |
+
+| 作用                        | 命令                                                                 |
+| --------------------------- | -------------------------------------------------------------------- |
+| 查看工作空间信息            | yarn workspaces info                                                 |
+| 给根空间添加依赖            | yarn add chalk cross-spawn fs-extra --ignore-workspace-root-check    |
+| 给某个项目添加依赖          | yarn workspace create-react-app3 add commander                       |
+| 删除所有的 node_modules     | lerna clean 等于 yarn workspaces run clean                           |
+| 安装和 link                 | yarn install 等于 lerna bootstrap --npm-client yarn --use-workspaces |
+| 重新获取所有的 node_modules | yarn install --force                                                 |
+| 查看缓存目录                | yarn cache dir                                                       |
+| 清除本地缓存                | yarn cache clean                                                     |
 
 ## 7.调试命令
+
 .vscode\launch.json
+
 ```json
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "vue-cli",
-            "cwd":"${workspaceFolder}",
-            "runtimeExecutable": "npm",
-            "runtimeArgs": [
-                "run",
-                "create"
-            ],
-            "port":9229,
-            "autoAttachChildProcesses": true,
-            "stopOnEntry": true,
-            "skipFiles": [
-                "<node_internals>/**"
-            ]
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "vue-cli",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "create"],
+      "port": 9229,
+      "autoAttachChildProcesses": true,
+      "stopOnEntry": true,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
 }
 ```
-## 8.配置alias
-Create React App无eject配置 打包成相对路径配置 在package.json中增加：
+
+## 8.配置 alias
+
+Create React App 无 eject 配置 打包成相对路径配置 在 package.json 中增加：
+
 ```
 "homepage": "."
 ```
-## 9.解决vscode卡顿问题
-vscode在任务管理器观察CPU占用率100% 解决方案 VScode中文件->首选项->设置 ，之后搜索"search.followSymlinks":true,然后设置为false
+
+## 9.解决 vscode 卡顿问题
+
+vscode 在任务管理器观察 CPU 占用率 100% 解决方案 VScode 中文件->首选项->设置 ，之后搜索"search.followSymlinks":true,然后设置为 false
 
 ![](/public/images/20210805195616161_1637830390170.png)
 
-## 10. window编译C++
+## 10. window 编译 C++
+
 - [node-gyp](https://github.com/nodejs/node-gyp)
 - [node-sass](https://www.npmjs.com/package/node-sass)
 
 ### 10.1 Python executable python2 in the PATH
+
 - npm install 报错 check python checking for Python executable python2 in the PATH
 - 删除 node_modules 文件夹
 - 在 Terminal 运行 `npm install --global windows-build-tools --save`
@@ -228,11 +264,13 @@ vscode在任务管理器观察CPU占用率100% 解决方案 VScode中文件->首
 - 如果遇到 `Node Sass could not find a binding for your current environment`，再运行 `npm rebuild node-sass` 就可以了
 
 ### 10.2 getaddrinfo ENOENT raw.githubusercontent.com
-- 点开网址 [https://www.ipaddress.com/](https://www.ipaddress.com/) ，输入raw.githubusercontent.com，点击查询：
-- 修改hosts文件 `C:\Windows\System32\drivers\etc\hosts` `ip raw.githubusercontent.com`
+
+- 点开网址 [https://www.ipaddress.com/](https://www.ipaddress.com/) ，输入 raw.githubusercontent.com，点击查询：
+- 修改 hosts 文件 `C:\Windows\System32\drivers\etc\hosts` `ip raw.githubusercontent.com`
 - npm install
 
 ### 10.3 npm ERR! gyp verb which failed Error: not found: python2
+
 - npm config set python `C:/Python27/python.exe`
 
 ### 10.4
@@ -245,7 +283,7 @@ C:\Users\zhangrenyang\AppData\Roaming\npm\node_modules\node-gyp\gyp\pylib\gyp\MS
 
 npm audit fix
 
-## 11. .npmr镜像
+## 11. .npmr 镜像
 
 mirror config
 
@@ -254,16 +292,21 @@ sharp_dist_base_url = [https://npm.taobao.org/mirrors/sharp-libvips/v8.9.1/](htt
 git config --global http.proxy "127.0.0.1:33210"
 
 ## 12. clean-react-source
+
 - [clean-react-source](https://www.npmjs.com/package/clean-react-source)
 
 ## 13. robotjs
-### 13.1 下载python
+
+### 13.1 下载 python
+
 - [https://www.microsoft.com/zh-cn/p/python-310/9pjpw5ldxlz5?activetab=pivot:overviewtab](https://www.microsoft.com/zh-cn/p/python-310/9pjpw5ldxlz5?activetab=pivot:overviewtab)
 
-### 13.2 下载node-gyp
+### 13.2 下载 node-gyp
+
 - [https://github.com/nodejs/node-gyp#on-windows](https://github.com/nodejs/node-gyp#on-windows)
 
-### 13.3 下载BuildTools
+### 13.3 下载 BuildTools
+
 - [https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools](https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools)
 
 ```
@@ -271,15 +314,18 @@ npm config set msvs_version 2019
 
 ```
 
-- 使用C++的桌面开发
-- Node.js生成工具
+- 使用 C++的桌面开发
+- Node.js 生成工具
 
 ## 13. detach_node_modules
+
 ```
 npm install detach_node_modules -g
 detach
 ```
+
 ## 14.关闭百度热点
+
 - [关闭百度热点](https://www.zhihu.com/question/47747794)
 - [adblockplus](https://adblockplus.org/)
 
@@ -296,20 +342,45 @@ www.baidu.com##a[id="hotsearch-refresh-btn"]
 www.baidu.com##a[id="lm-new"]
 www.baidu.com##div[class="title-text c-font-medium c-color-t"]
 
-under-searchbox-tips 
+under-searchbox-tips
 ```
 
 ## 15.安装软件
+
 - [https://dev.mysql.com/downloads/mysql/5.7.html](https://dev.mysql.com/downloads/mysql/5.7.html)
 - [mongodb](https://www.mongodb.com/try/download)
 
 ## 16.ESM
+
 - [https://blog.csdn.net/qq_21567385/article/details/121440227](https://blog.csdn.net/qq_21567385/article/details/121440227)
 
 ## 17 github
-配置hosts文件 C:\Windows\System32\drivers\etc\HOSTS
+
+配置 hosts 文件 C:\Windows\System32\drivers\etc\HOSTS
 
 ## GitHub Start
+
 140.82.112.3 github.com 140.82.114.4 gist.github.com 185.199.108.153 assets-cdn.github.com 185.199.108.133 raw.githubusercontent.com 185.199.108.133 gist.githubusercontent.com 185.199.108.133 cloud.githubusercontent.com 185.199.108.133 camo.githubusercontent.com 185.199.108.133 avatars.githubusercontent.com 185.199.108.133 avatars0.githubusercontent.com 185.199.108.133 avatars1.githubusercontent.com 185.199.108.133 avatars2.githubusercontent.com 185.199.108.133 avatars3.githubusercontent.com 185.199.108.133 avatars4.githubusercontent.com 185.199.108.133 avatars5.githubusercontent.com 185.199.108.133 avatars6.githubusercontent.com 185.199.108.133 avatars7.githubusercontent.com 185.199.108.133 avatars8.githubusercontent.com
 
 ## GitHub End
+
+## 18.把 ts 变为 js
+
+```bash
+npm install strip-typescript -g
+strip-typescript src/**/*.ts
+
+
+npm install strip-flowtype -g
+strip-flowtype src/**/*.js
+```
+
+## 19.cra 支持@别名
+
+## 20.规范手册
+
+- [JAVA 开发手册](https://static.zhufengpeixun.com/JAVA_kai_fa_shou_ce_20200422_1655798543862.pdf)
+
+## 21.快捷键
+
+![](/public/images/vscode-mac-shortcut.png)
