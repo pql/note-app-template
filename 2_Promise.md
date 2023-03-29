@@ -30,7 +30,7 @@ promise.then(Fulfilled, Rejected)
 - 构造一个Promise实例需要给Promise构造函数传入一个函数。
 - 传入的函数需要有两个形参，两个形参都是function类型的参数。
     - 第一个形参运行后会让 Promise 实例处于 resolve 状态，所以我们一般给第一个形参命名为 resolve,使 Promise 对象的状态改变成成功，同时传递一个参数用于后续成功后的操作
-    - 第一个形参运行后会让 Promise 实例处于 reject 状态，所以我们一般给第一个形参命名为 reject, 将 Promise 对象的状态改变为失败，同时将错误的信息传递到后续错误处理的操作
+    - 第二个形参运行后会让 Promise 实例处于 reject 状态，所以我们一般给第二个形参命名为 reject, 将 Promise 对象的状态改变为失败，同时将错误的信息传递到后续错误处理的操作
 
 ### 4.2 es5模拟Promise
 ```js
