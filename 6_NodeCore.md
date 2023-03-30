@@ -13,7 +13,7 @@
 ## 2.全局作用域
 - 全局作用域（global）可以定义一些不需要通过任何模块的加载即可使用的变量、函数或类
 - 定义全局变量时变量会称为global的属性
-- 永远不要不使用var关键字定义变量，以免污染全局作用域
+- 永远不要使用var关键字定义变量，以免污染全局作用域
 - setTimeout clearTimeout
 - setInterval clearInterval
 - unref 和 ref
