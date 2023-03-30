@@ -45,6 +45,7 @@
 ### 3.5 Event Loop
 
 主线程从任务队列中读取事件，这个过程是循环不断的，所以整个的这种运行机制又称为 Event Loop(事件循环)
+
 ![](/public/images/eventloop.png)
 
 ### 3.6 Node.js 的 Event Loop
