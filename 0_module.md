@@ -1,24 +1,30 @@
 ## 1.模块化
+
 模块化是指把一个复杂的系统分解到多个模块以方便编码.
 
 ### 1.1 命名空间
+
 开发网页要通过命名空间的方式来组织代码
+
 ```js
 <script src="jquery.js">
 ```
+
 - 命名空间/冲突，两个库可能会使用同一个名称
 - 无法合理地管理项目的依赖和版本
 - 无法方便地控制依赖的加载顺序
 
 ### 1.2 CommonJS
+
 CommonJS 是一种使用广泛的 `JavaScript` 模块化规范，核心思想是通过 `require` 方法来同步地加载依赖的其他模块，通过 module.exports 到处需要暴露的接口
 
 #### 1.2.1 用法
+
 采用 CommonJS 导入及导出时的代码如下：
 
 ```js
 // 导入
-const someFun = require('./someFun.js');
+const someFun = require("./someFun.js");
 someFun();
 
 // 导出
@@ -26,93 +32,112 @@ module.exports = someFun;
 ```
 
 #### 1.2.2 原理
+
 a.js
+
 ```js
-const path = require('path');
-const fs = require('fs');
-const b = require('./b.js');
+const path = require("path");
+const fs = require("fs");
+const b = require("./b.js");
 
 function req(mod) {
-    const filename = path.join(__dirname, mod);
-    const content = fs.readFileSync(filename, 'utf8');
-    const fn = new Function('exports', 'require', 'module', '__filename', '__dirname', content + '\n return module.exports;');
-    const module = {
-        exports: {}
-    };
-    
-    return fn(module.exports, req, module, __filename, __dirname);
-}
+  const filename = path.join(__dirname, mod);
+  const content = fs.readFileSync(filename, "utf8");
+  const fn = new Function(
+    "exports",
+    "require",
+    "module",
+    "__filename",
+    "__dirname",
+    content + "\n return module.exports;"
+  );
+  const module = {
+    exports: {},
+  };
 
+  return fn(module.exports, req, module, __filename, __dirname);
+}
 ```
 
 b.js
+
 ```js
-console.log('bbb');
-exports.name = 'zfpx';
+console.log("bbb");
+exports.name = "zfpx";
 ```
 
 ### 1.3 AMD
+
 AMD 也是一种 JavaScript 模块化规范，与 CommonJS 最大的不同在于它采用异步的方式去加载依赖的模块。 AMD 规范主要是为了解决针对浏览器环境的模块化问题，最具代表性的实现是 requirejs。
 
 AMD 的优点
+
 - 可在不转换代码的情况下直接在浏览器中运行
 - 可加载多个依赖
 - 代码可以运行在浏览器环境和 Node.js 环境下
 
 AMD 的缺点
+
 - JavaScript 运行环境没有原生支持 AMD，需要先导入实现了 AMD 的库后才能正常使用。
 
 #### 1.3.1 用法
+
 ```js
 // 定义一个模块
-define('a', [], function(){
-    return 'a';
+define("a", [], function () {
+  return "a";
 });
-define('b', ['a'], function(a){
-    return a + 'b'; 
+define("b", ["a"], function (a) {
+  return a + "b";
 });
 // 导入和使用
-require(['b'], function(b){
-    console.log(b);
+require(["b"], function (b) {
+  console.log(b);
 });
 ```
 
 #### 1.3.2 原理
+
 ```js
 let factories = {};
 function define(modName, dependencies, factory) {
-    factory.dependencies = dependencies;
-    factories[modName] = factory;
+  factory.dependencies = dependencies;
+  factories[modName] = factory;
 }
 function require(modNames, callback) {
-    const loadedModNames = modNames.map(function(modName){
-        const factory = factories[modName];
-        const dependencies = factory.dependencies;
-        let exports;
-        require(depencencies, function(...dependencyMods){
-            exports = factory.apply(null, dependencyMods);
-        });
-        return exports;
+  const loadedModNames = modNames.map(function (modName) {
+    const factory = factories[modName];
+    const dependencies = factory.dependencies;
+    let exports;
+    require(depencencies, function (...dependencyMods) {
+      exports = factory.apply(null, dependencyMods);
     });
-    callback.apply(null, loadedModNames);
+    return exports;
+  });
+  callback.apply(null, loadedModNames);
 }
 ```
 
 ### 1.4 ES6 模块化
+
 ES6 模块化`ECMA` 提出的`JavaScript` 模块化规范，它在语言的层面上实现了模块化。浏览器厂商和`Node.js` 都宣布要原生支持该规范，它将逐渐取代 CommonJS 和 AMD 规范，成为浏览器和服务器通用的模块解决方案。采用 ES6 模块化导入及导出时的代码如下
+
 ```js
 // 导入
-import { name } from './person.js';
+import { name } from "./person.js";
 
 // 导出
-export const name = 'zfpx';
+export const name = "zfpx";
 ```
+
 ES6 模块虽然是终极模块化方案，但它的缺点在于目前无法直接运行在大部分 JavaScript 运行环境下，必须通过工具转换成标准的 ES5 后才能正常运行。
 
 ## 2.自动化构建
-构建就是做这件事情，把源代码转换成发布到线上的可执行 JavaScript、CSS、HTML代码，包括如下内容。
-- 代码转换： ECMASCRIPT6 编译成 ECMASCRIPT5、LESS编译成CSS等。
-- 文件优化： 压缩 JavaScript、CSS、HTML代码，压缩合并图片等。
+
+构建就是做这件事情，把源代码转换成发布到线上的可执行 JavaScript、CSS、HTML 代码，包括如下内容。
+
+- 代码转换： ECMASCRIPT6 编译成 ECMASCRIPT5、LESS 编译成 CSS 等。
+- 文件优化： 压缩 JavaScript、CSS、HTML 代码，压缩合并图片等。
 - 代码分割： 提取多个页面的公共代码、提取首屏不需要执行部分的代码让其异步加载
 - 模块合并： 在采用模块化的项目里会有很多模块和文件，需要构建功能把模块分类合并成一个文件
 - 自动刷新： 监听本地源代码的变化，自动重新构建、刷新浏览器。
@@ -120,14 +145,17 @@ ES6 模块虽然是终极模块化方案，但它的缺点在于目前无法直�
 - 自动发布： 更新完代码后，自动构建出线上发布代码并传输给发布系统。
 
 ## 3.Webpack
+
 Webpack 是一个打包模块化 JavaScript 的工具，在 Webpack 里的一切文件皆模块，通过 Loader 转换文件，通过 Plugin 注入钩子，最后输出由多个模块组合成的文件。Webpack 专注于构建模块化项目。
 
 一切文件：JavaScript、CSS、SCSS、图片、模板，在 Webpack 眼中都是一个个模块，这样的好处是能清晰的描述出各个模块之间的依赖关系，以方便 Webpack 对模块进行组合打包。经过 Webpack 的处理，最终会输出浏览器能使用的静态资源。
 
 ### 3.1 安装 Webpack
+
 在用 Webpack 执行构建任务时需要通过 webpack 可执行文件去启动构建任务，所以需要安装 webpack 可执行文件。
 
 #### 3.1.1 安装 Webpack 到本项目
+
 ```sh
 # 安装最新稳定版
 npm i -D webpack
@@ -138,33 +166,36 @@ npm i -D webpack@<version>
 # 安装最新体验版本
 npm i -D webpack@beta
 ```
+
 > npm i -D 是 `npm install --save-dev` 的简写，是指安装模块并保存到 package.json 的 devDependencies
 
 #### 3.1.2 安装 Webpack 到全局
+
 安装到全局后你可以在任何地方公用一个 Webpack 可执行文件，而不用各个项目重复安装
+
 ```sh
 npm i -g webpack
 ```
+
 > 推荐安装到当前项目，原因是可防止不同项目依赖不同版本的 Webpack 而导致冲突
 
 #### 3.1.3 使用 Webpack
+
 ```js
 (function (modules) {
-    function require(moduleId) {
-        var module = {
-            exports: {}
-        };
-        modules[moduleId].call(module.exports, module, module.exports, require);
-        return module.exports;
-    }
-    return require("./index.js");
-})
-    ({
-        "./index.js":
-            (function (module, exports, require) {
-                eval("console.log('hello');\n\n");
-            })
-    });
+  function require(moduleId) {
+    var module = {
+      exports: {},
+    };
+    modules[moduleId].call(module.exports, module, module.exports, require);
+    return module.exports;
+  }
+  return require("./index.js");
+})({
+  "./index.js": function (module, exports, require) {
+    eval("console.log('hello');\n\n");
+  },
+});
 ```
 
 ```sh
@@ -207,6 +238,7 @@ console.log('compile sucessfully!');
 ```
 
 #### 3.1.4 依赖其他模块
+
 ```sh
 #! /usr/bin/env node
 const pathLib = require('path');
@@ -242,12 +274,12 @@ let bundle = `
             })
        <%if(modules.length>0){%>,<%}%>
         <%for(let i=0;i<modules.length;i++){
-            let module = modules[i];%>   
+            let module = modules[i];%>
             "<%-module.name%>":
             (function (module, exports, require) {
                 eval(\`<%-module.script%>\`);
             })
-        <% }%>    
+        <% }%>
     });
 `
 let bundlejs = ejs.render(bundle, {

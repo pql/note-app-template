@@ -218,10 +218,14 @@ socket.on("connect", callback);
 ```
 
 <<<<<<< HEAD
+
 #### 1.3.2 向服务器写入数据、end、error、destroy、close
+
 =======
+
 #### 1.3.2 向服务器写入数据、write、end、error、destroy、close
->>>>>>> origin/main
+
+> > > > > > > origin/main
 
 - write 表示向服务器写入数据
 - end 用于结束连接
@@ -301,7 +305,8 @@ server.getConnections((err, count) => {
 unref 方法指定发往客户端连接被全部关闭时退出应用程序 ，如果将 allowHalfOpen 方法，必须使用与客户端连接的 socket 接口对象的 end 方法主动关闭服务器端连接
 =======
 unref 方法指定发往客户端连接被全部关闭时退出应用程序 ，如果将 allowHalfOpen 方法设置为 true，必须使用与客户端连接的 socket 接口对象的 end 方法主动关闭服务器端连接
->>>>>>> origin/main
+
+> > > > > > > origin/main
 
 ```js
 const net = require("net");
@@ -531,11 +536,10 @@ socket.send(buffer, offset, length, port, address, [callback]);
 - address 接收数据的 socket 地址
 - callback 制定当数据发送完毕时所需要的回调函数
   - err 错误对象
-<<<<<<< HEAD
-  - bytes 实际发送的字节数
-=======
+    <<<<<<< HEAD
+  - # bytes 实际发送的字节数
   - byets 实际发送的字节数
->>>>>>> origin/main
+    > > > > > > > origin/main
 
 ### 2.3 address
 
