@@ -22,7 +22,7 @@ URI（Uniform Resource Identifier）是统一资源标识符，在某个规则�
 
 ### 2.2 URL
 
-URL (Uniform Resource Location)统一资源定位符，表示资源的地点，URL 时使用浏览器访问 WEB 页面时需要输入文案】
+URL (Uniform Resource Location)统一资源定位符，表示资源的地点，URL 是使用浏览器访问 WEB 页面时需要输入文案】
 
 ### 2.3 URL 的格式
 
@@ -81,6 +81,7 @@ HTTP 可以在传输的过程中通过编码提升传输效率，但是会消耗
 #### 3.3.1 编码压缩
 
 发送文件时可以先用 ZIP 压缩功能后再发送文件
+
 ![](/public/images/compress.png)
 
 - gzip
@@ -91,22 +92,26 @@ HTTP 可以在传输的过程中通过编码提升传输效率，但是会消耗
 #### 3.3.2 分割发送的分块传输编码
 
 请求的实体在尚未传输完成前浏览器不能显示。所以在传输大容量数据时，通过把数据分割成多块，能让浏览器逐步显示页面。
+
 ![](/public/images/encoding.png)
 
 #### 3.3.3 多部分对象集合
 
 - 一份报告主体中可以包含多类型实体。
 - 使用 boundary 字符串来划分多部分对象指明的各类实体。在各个实体其实行之前插入--标记，多部分对象集合最后插入--标记
-  ![](/public/images/mime.png)
+
+![](/public/images/mime.png)
 
 #### 3.3.3.1 multipart/form-data
 
 上传表单时使用 multiparty/form-data
+
 ![](/public/images/form-data.png)
 
 #### 3.3.3.2 multipart/byteranges 206(Particial Content)
 
-状态码（Partical Content）响应报文中包含多个范围时使用
+状态码（Particial Content）响应报文中包含多个范围时使用
+
 ![](/public/images/byteranges.png)
 
 #### 3.3.4 获取部分内容的范围请求
@@ -115,7 +120,7 @@ HTTP 可以在传输的过程中通过编码提升传输效率，但是会消耗
 
 - 请求头中的 Range 来指定资源的 byte 范围
 - 响应会返回状态吗 206 响应报文
-- 对于多重范围的范围请求，响应会在首部字段（<code>Content-Type</code>中标明 <code>multipart/byteranges</code>）
+- 对于多重范围的范围请求，响应会在首部字段（`Content-Type`中标明 `multipart/byteranges`）
 - ![](/public/images/partial.png)
 - ![](/public/images/bytes.png)
 
@@ -183,6 +188,7 @@ HTTP 可以在传输的过程中通过编码提升传输效率，但是会消耗
 #### 4.2.1 代理
 
 代理就是客户端和服务器的中间人
+
 ![](/public/images/proxy.png)
 
 ##### 4.2.1.1 为啥使用代理
@@ -202,7 +208,8 @@ HTTP 可以在传输的过程中通过编码提升传输效率，但是会消耗
 
 - 使通信线上的服务器提供非 HTTP 协议服务
 - 提高通信安全性
-  ![](/public/images/gate-way.png)
+
+![](/public/images/gate-way.png)
 
 ## 5.首部
 
